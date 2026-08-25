@@ -1,3 +1,5 @@
+import ErrorMessage from './ErrorMessage'
+
 const STATUS_OPTIONS = ['todo', 'in_progress', 'done']
 
 export default function ReviewList({
@@ -83,11 +85,7 @@ export default function ReviewList({
           Clear
         </button>
       </div>
-      {saveError ? (
-        <p className="error-message" role="alert">
-          {saveError}
-        </p>
-      ) : null}
+      <ErrorMessage message={saveError} />
     </section>
   )
 }

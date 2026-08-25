@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ErrorMessage from './ErrorMessage'
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10)
@@ -41,11 +42,7 @@ export default function NotesInput({ onExtract, isExtracting, error }) {
             {isExtracting ? 'Extracting...' : 'Extract Action Items'}
           </button>
         </div>
-        {error ? (
-          <p className="error-message" role="alert">
-            {error}
-          </p>
-        ) : null}
+        <ErrorMessage message={error} />
       </form>
     </section>
   )

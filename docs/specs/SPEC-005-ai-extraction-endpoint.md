@@ -178,7 +178,8 @@ None — this is a backend endpoint. Consumed by #4's UI.
 
 ## Open Questions
 
-- [ ] Which model/provider is used for extraction, and does it support native JSON-mode/structured output, or does the endpoint need to enforce the schema itself post-hoc?
+- [x] Which model/provider is used for extraction, and does it support native JSON-mode/structured output, or does the endpoint need to enforce the schema itself post-hoc? — Resolved: Anthropic Claude (`claude-opus-5`) via `messages.parse()` + `zodOutputFormat`, native structured output.
+- [x] Production hosting for this endpoint — Resolved 2026-08-25: Vercel serverless function at `api/extract.js`, sharing core logic (`server/extraction.js`, `server/handleExtractRequest.js`) with the local Vite dev-server middleware so both entry points stay identical. See `vercel.json` (`maxDuration: 30`).
 - [ ] Should the endpoint be rate-limited per user to control cost, or is that out of scope for MVP?
 
 ## References

@@ -1,16 +1,46 @@
-# React + Vite
+# Meeting Action Items
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Paste raw meeting notes, extract action items with AI, review/edit before
+saving, and manage them in a per-user task list backed by Supabase.
 
-Currently, two official plugins are available:
+See `docs/adr/ADR-001-core-architecture.md` for the architecture decisions
+and `docs/specs/` for the per-issue specs this app was built against.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Setup
 
-## React Compiler
+1. Install dependencies:
+   ```
+   npm install
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2. Create a Supabase project, then apply the migrations in
+   `supabase/migrations/` (via the SQL editor or `supabase db push`) —
+   see `supabase/README.md`.
 
-## Expanding the Oxlint configuration
+3. Copy `.env.example` to `.env` and fill in:
+   - `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` — from the Supabase
+     project's API settings.
+   - `ANTHROPIC_API_KEY` — server-side only, never exposed to the browser.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+4. Run the dev server:
+   ```
+   npm run dev
+   ```
+   This serves the app and, locally, the `/api/extract` endpoint via a
+   Vite dev-server middleware (`server/devMiddlewarePlugin.js`).
+
+## Scripts
+
+- `npm run dev` — local dev server (app + `/api/extract`)
+- `npm run build` — production build (`dist/`)
+- `npm test` — unit tests (vitest)
+- `npm run lint` — lint (oxlint)
+
+## Deployment
+
+Deploys to Vercel: it serves the Vite static build and `api/extract.js`
+(a Vercel serverless function — see `docs/specs/SPEC-005-ai-extraction-endpoint.md`)
+from one project. Set `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and
+`ANTHROPIC_API_KEY` as Vercel project environment variables before
+deploying — `ANTHROPIC_API_KEY` only needs to reach the serverless
+function, not the client bundle.

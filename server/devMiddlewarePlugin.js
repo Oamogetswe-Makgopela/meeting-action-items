@@ -1,4 +1,4 @@
-import { runExtraction, ExtractionValidationError, ExtractionModelError } from './extraction.js'
+import { handleExtractRequest } from './handleExtractRequest.js'
 
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -39,30 +39,9 @@ export default function extractApiPlugin() {
           return
         }
 
-        try {
-          const action_items = await runExtraction({
-            notes: body.notes,
-            meetingDate: body.meeting_date,
-          })
-          res.statusCode = 200
-          res.end(JSON.stringify({ action_items }))
-        } catch (err) {
-          if (err instanceof ExtractionValidationError) {
-            res.statusCode = 400
-            res.end(JSON.stringify({ error: 'bad_request', message: err.message }))
-          } else if (err instanceof ExtractionModelError) {
-            res.statusCode = 502
-            res.end(JSON.stringify({ error: 'schema_validation_error', message: err.message }))
-          } else {
-            res.statusCode = 502
-            res.end(
-              JSON.stringify({
-                error: 'model_error',
-                message: 'Extraction failed. Check that the AI provider is configured correctly.',
-              }),
-            )
-          }
-        }
+        const { status, body: responseBody } = await handleExtractRequest(body)
+        res.statusCode = status
+        res.end(JSON.stringify(responseBody))
       })
     },
   }

@@ -125,9 +125,12 @@ renders but is disabled or a visual no-op until #5 exists.
 
 ## Rollout Plan
 
-- No deployment target defined yet at this stage; this spec covers local
-  development scaffolding only. Hosting/deployment will be addressed when
-  the app has functional AI extraction and Supabase wiring.
+- Resolved 2026-08-25: deploy to Vercel — it serves the Vite static build
+  and the `api/extract.js` serverless function (see SPEC-005) from one
+  project/deploy, so no separate hosting decision is needed for the
+  frontend. `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and
+  `ANTHROPIC_API_KEY` need to be set as Vercel project environment
+  variables before deploying.
 
 ## Metrics & Success Criteria
 

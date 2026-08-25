@@ -1,9 +1,30 @@
 # Responsive Layout Pass Specification
 
-**Status:** Draft
+**Status:** Implemented
 **Owner:** Oamogetswe Makgopela
 **Created:** 2026-08-25
 **Last Updated:** 2026-08-25
+
+## Audit Results (2026-08-25)
+
+Audited with populated review-list and saved-task rows at the three target
+breakpoints, using an iframe of the exact width sized inside the running
+dev app (window resize was unreliable in this environment, so the iframe
+gave a more precise, reproducible viewport than the browser window itself).
+
+- **375px:** notes controls and review/task row fields stack vertically
+  (existing `@media (max-width: 480px)` rule) - Add Task / Save Tasks /
+  Clear wrap correctly, all buttons meet the 44px touch-target height
+  already set on `.btn`. `document.body.scrollWidth === clientWidth`
+  (360px, no horizontal overflow).
+- **768px:** row layout (fields side-by-side) fits without cramping;
+  `scrollWidth === clientWidth` (753px, no overflow).
+- **1280px:** `.app`'s `max-width: 960px` centers content; no overflow
+  (`scrollWidth === clientWidth`, 1265px).
+
+No CSS changes were needed - the responsive rules added incrementally in
+issues #1, #4, #6, and #8 already satisfy both acceptance criteria. This
+spec is closed as an audit with no fixes required, not skipped.
 
 Issue: [#10 - Responsive layout pass for desktop and mobile](https://github.com/Oamogetswe-Makgopela/meeting-action-items/issues/10)
 ADR: [ADR-001: Core Architecture](../adr/ADR-001-core-architecture.md) (Decision 1); app description UX requirements

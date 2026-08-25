@@ -5,6 +5,7 @@ import NotesInput from './components/NotesInput'
 import ReviewList from './components/ReviewList'
 import TaskList from './components/TaskList'
 import { extractActionItems, ExtractionError } from './lib/extraction'
+import { saveTasks, SaveError } from './lib/tasks'
 
 function blankItem() {
   return { title: '', description: '', owner: '', due_date: '', status: 'todo' }
@@ -15,6 +16,9 @@ function App() {
   const [sourceNotes, setSourceNotes] = useState('')
   const [isExtracting, setIsExtracting] = useState(false)
   const [extractionError, setExtractionError] = useState(null)
+  const [savedTasks, setSavedTasks] = useState([])
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
 
   async function handleExtract({ notes, meetingDate }) {
     setIsExtracting(true)
@@ -46,6 +50,23 @@ function App() {
   function handleClear() {
     setActionItems([])
     setSourceNotes('')
+    setSaveError(null)
+  }
+
+  async function handleSave() {
+    setIsSaving(true)
+    setSaveError(null)
+    try {
+      const inserted = await saveTasks(actionItems, sourceNotes)
+      setSavedTasks((tasks) => [...tasks, ...inserted])
+      setActionItems([])
+      setSourceNotes('')
+    } catch (err) {
+      const message = err instanceof SaveError ? err.message : 'Saving failed.'
+      setSaveError(message)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -58,13 +79,15 @@ function App() {
           <NotesInput onExtract={handleExtract} isExtracting={isExtracting} error={extractionError} />
           <ReviewList
             items={actionItems}
-            sourceNotes={sourceNotes}
             onUpdateItem={handleUpdateItem}
             onDeleteItem={handleDeleteItem}
             onAddItem={handleAddItem}
             onClear={handleClear}
+            onSave={handleSave}
+            isSaving={isSaving}
+            saveError={saveError}
           />
-          <TaskList />
+          <TaskList items={savedTasks} />
         </AuthGate>
       </main>
     </div>

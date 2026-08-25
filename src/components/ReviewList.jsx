@@ -1,6 +1,15 @@
 const STATUS_OPTIONS = ['todo', 'in_progress', 'done']
 
-export default function ReviewList({ items = [], onUpdateItem, onDeleteItem, onAddItem, onClear }) {
+export default function ReviewList({
+  items = [],
+  onUpdateItem,
+  onDeleteItem,
+  onAddItem,
+  onClear,
+  onSave,
+  isSaving,
+  saveError,
+}) {
   return (
     <section className="panel review-list" aria-labelledby="review-list-heading">
       <h2 id="review-list-heading">Review Action Items</h2>
@@ -67,13 +76,18 @@ export default function ReviewList({ items = [], onUpdateItem, onDeleteItem, onA
         <button type="button" className="btn" onClick={onAddItem}>
           Add Task
         </button>
-        <button type="button" className="btn btn-primary" disabled title="Saving is not available yet">
-          Save Tasks
+        <button type="button" className="btn btn-primary" onClick={onSave} disabled={items.length === 0 || isSaving}>
+          {isSaving ? 'Saving...' : 'Save Tasks'}
         </button>
-        <button type="button" className="btn" onClick={onClear} disabled={items.length === 0}>
+        <button type="button" className="btn" onClick={onClear} disabled={items.length === 0 || isSaving}>
           Clear
         </button>
       </div>
+      {saveError ? (
+        <p className="error-message" role="alert">
+          {saveError}
+        </p>
+      ) : null}
     </section>
   )
 }

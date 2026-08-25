@@ -163,6 +163,70 @@
   border-color: #c53030;
 }
 
+.task-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-row {
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.task-row-title {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.task-row-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.task-row-fields input,
+.task-row-fields select {
+  font: inherit;
+  padding: 0.4rem;
+  min-height: 44px;
+}
+
+.task-row-completed {
+  background: #f7f7f7;
+  border-color: #d6d6d6;
+}
+
+.task-row-completed .task-row-title {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.task-row-overdue {
+  border-color: #c53030;
+}
+
+.task-overdue-badge {
+  align-self: flex-start;
+  background: #c53030;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+}
+
 @media (max-width: 480px) {
   .app {
     padding: 0.75rem;
@@ -173,7 +237,8 @@
     align-items: stretch;
   }
 
-  .review-row-fields {
+  .review-row-fields,
+  .task-row-fields {
     flex-direction: column;
     align-items: stretch;
   }

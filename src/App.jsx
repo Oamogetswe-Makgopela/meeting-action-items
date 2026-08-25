@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import AuthGate from './components/AuthGate'
 import NotesInput from './components/NotesInput'
 import ReviewList from './components/ReviewList'
 import TaskList from './components/TaskList'
 import { extractActionItems, ExtractionError } from './lib/extraction'
-import { saveTasks, SaveError } from './lib/tasks'
+import { saveTasks, fetchTasks, updateTask, deleteTask, TaskError } from './lib/tasks'
 
 function blankItem() {
   return { title: '', description: '', owner: '', due_date: '', status: 'todo' }
@@ -19,6 +19,28 @@ function App() {
   const [savedTasks, setSavedTasks] = useState([])
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true)
+  const [tasksError, setTasksError] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchTasks()
+      .then((tasks) => {
+        if (!cancelled) setSavedTasks(tasks)
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          const message = err instanceof TaskError ? err.message : 'Could not load saved tasks.'
+          setTasksError(message)
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingTasks(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   async function handleExtract({ notes, meetingDate }) {
     setIsExtracting(true)
@@ -58,14 +80,36 @@ function App() {
     setSaveError(null)
     try {
       const inserted = await saveTasks(actionItems, sourceNotes)
-      setSavedTasks((tasks) => [...tasks, ...inserted])
+      setSavedTasks((tasks) => [...inserted, ...tasks])
       setActionItems([])
       setSourceNotes('')
     } catch (err) {
-      const message = err instanceof SaveError ? err.message : 'Saving failed.'
+      const message = err instanceof TaskError ? err.message : 'Saving failed.'
       setSaveError(message)
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  async function handleUpdateTask(id, patch) {
+    setTasksError(null)
+    try {
+      const updated = await updateTask(id, patch)
+      setSavedTasks((tasks) => tasks.map((task) => (task.id === id ? updated : task)))
+    } catch (err) {
+      const message = err instanceof TaskError ? err.message : 'Could not update task.'
+      setTasksError(message)
+    }
+  }
+
+  async function handleDeleteTask(id) {
+    setTasksError(null)
+    try {
+      await deleteTask(id)
+      setSavedTasks((tasks) => tasks.filter((task) => task.id !== id))
+    } catch (err) {
+      const message = err instanceof TaskError ? err.message : 'Could not delete task.'
+      setTasksError(message)
     }
   }
 
@@ -87,7 +131,13 @@ function App() {
             isSaving={isSaving}
             saveError={saveError}
           />
-          <TaskList items={savedTasks} />
+          <TaskList
+            items={savedTasks}
+            isLoading={isLoadingTasks}
+            error={tasksError}
+            onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
+          />
         </AuthGate>
       </main>
     </div>

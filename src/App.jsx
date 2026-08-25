@@ -21,6 +21,19 @@ function App() {
   const [saveError, setSaveError] = useState(null)
   const [isLoadingTasks, setIsLoadingTasks] = useState(true)
   const [tasksError, setTasksError] = useState(null)
+  const [pendingTaskIds, setPendingTaskIds] = useState(new Set())
+
+  function addPendingTaskId(id) {
+    setPendingTaskIds((ids) => new Set(ids).add(id))
+  }
+
+  function removePendingTaskId(id) {
+    setPendingTaskIds((ids) => {
+      const next = new Set(ids)
+      next.delete(id)
+      return next
+    })
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -93,23 +106,29 @@ function App() {
 
   async function handleUpdateTask(id, patch) {
     setTasksError(null)
+    addPendingTaskId(id)
     try {
       const updated = await updateTask(id, patch)
       setSavedTasks((tasks) => tasks.map((task) => (task.id === id ? updated : task)))
     } catch (err) {
       const message = err instanceof TaskError ? err.message : 'Could not update task.'
       setTasksError(message)
+    } finally {
+      removePendingTaskId(id)
     }
   }
 
   async function handleDeleteTask(id) {
     setTasksError(null)
+    addPendingTaskId(id)
     try {
       await deleteTask(id)
       setSavedTasks((tasks) => tasks.filter((task) => task.id !== id))
     } catch (err) {
       const message = err instanceof TaskError ? err.message : 'Could not delete task.'
       setTasksError(message)
+    } finally {
+      removePendingTaskId(id)
     }
   }
 
@@ -137,6 +156,7 @@ function App() {
             error={tasksError}
             onUpdateTask={handleUpdateTask}
             onDeleteTask={handleDeleteTask}
+            pendingTaskIds={pendingTaskIds}
           />
         </AuthGate>
       </main>

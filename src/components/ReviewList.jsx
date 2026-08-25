@@ -1,6 +1,4 @@
-export default function ReviewList() {
-  const items = []
-
+export default function ReviewList({ items = [] }) {
   return (
     <section className="panel review-list" aria-labelledby="review-list-heading">
       <h2 id="review-list-heading">Review Action Items</h2>

@@ -118,12 +118,62 @@
   font-size: 0.9rem;
 }
 
+.review-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.review-row {
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.review-row-title,
+.review-row-description {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.review-row-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.review-row-fields input,
+.review-row-fields select {
+  font: inherit;
+  padding: 0.4rem;
+  min-height: 44px;
+}
+
+.btn-danger {
+  background: #fff;
+  color: #c53030;
+  border-color: #c53030;
+}
+
 @media (max-width: 480px) {
   .app {
     padding: 0.75rem;
   }
 
   .notes-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .review-row-fields {
     flex-direction: column;
     align-items: stretch;
   }

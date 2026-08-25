@@ -6,8 +6,13 @@ import ReviewList from './components/ReviewList'
 import TaskList from './components/TaskList'
 import { extractActionItems, ExtractionError } from './lib/extraction'
 
+function blankItem() {
+  return { title: '', description: '', owner: '', due_date: '', status: 'todo' }
+}
+
 function App() {
   const [actionItems, setActionItems] = useState([])
+  const [sourceNotes, setSourceNotes] = useState('')
   const [isExtracting, setIsExtracting] = useState(false)
   const [extractionError, setExtractionError] = useState(null)
 
@@ -17,12 +22,30 @@ function App() {
     try {
       const items = await extractActionItems({ notes, meetingDate })
       setActionItems(items)
+      setSourceNotes(notes)
     } catch (err) {
       const message = err instanceof ExtractionError ? err.message : 'Extraction failed.'
       setExtractionError(message)
     } finally {
       setIsExtracting(false)
     }
+  }
+
+  function handleUpdateItem(index, patch) {
+    setActionItems((items) => items.map((item, i) => (i === index ? { ...item, ...patch } : item)))
+  }
+
+  function handleDeleteItem(index) {
+    setActionItems((items) => items.filter((_, i) => i !== index))
+  }
+
+  function handleAddItem() {
+    setActionItems((items) => [...items, blankItem()])
+  }
+
+  function handleClear() {
+    setActionItems([])
+    setSourceNotes('')
   }
 
   return (
@@ -33,7 +56,14 @@ function App() {
       <main className="app-main">
         <AuthGate>
           <NotesInput onExtract={handleExtract} isExtracting={isExtracting} error={extractionError} />
-          <ReviewList items={actionItems} />
+          <ReviewList
+            items={actionItems}
+            sourceNotes={sourceNotes}
+            onUpdateItem={handleUpdateItem}
+            onDeleteItem={handleDeleteItem}
+            onAddItem={handleAddItem}
+            onClear={handleClear}
+          />
           <TaskList />
         </AuthGate>
       </main>
